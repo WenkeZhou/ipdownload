@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ page_number }}</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            {%  block header %}
+            <h1>This is h1 -----> iplist</h1>
+            {% end %}
+        </header>
+       <div class="main">
+           <div class="content">
+               {% block body %}
+               {% end %}
+           </div>
+       </div>
+    </div>
+</body>
+</html>

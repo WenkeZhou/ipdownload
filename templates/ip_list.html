@@ -1,0 +1,30 @@
+{% extends "main.html" %}
+{% autoescape None %}
+
+{% block body %}
+<h2>This is h2 ***********-> iplist</h2>
+<div class="ip_content" style="overflow: auto">
+    <h3>This is h3 $$$$$$$$$$$$-> iplist</h3>
+    <table id="ip_iplist">
+        <tr>
+            <th>IP地址</th>
+            <th>端口</th>
+            <th>类型</th>
+            <th>数度</th>
+            <th>连接时间</th>
+        </tr>
+        {% for ip in iplist %}
+            {{ modules.IpList(ip) }}
+        {% end %}
+<!--
+        <tr class="odd">
+            <td>{{ ip["ip"] }}</td>
+            <td>{{ ip["port"] }}</td>
+            <td>{{ ip["http_type"] }}</td>
+            <td>{{ ip["link_speed"] }}</td>
+            <td>{{ ip["link_time"] }}</td>
+        </tr>
+-->
+    </table>
+</div>
+{% end %}
