@@ -4,18 +4,31 @@
 {% block body %}
 <h2>This is h2 ***********-> iplist</h2>
 <div class="ip_content" style="overflow: auto">
-    <h3>This is h3 $$$$$$$$$$$$-> iplist</h3>
+    <h3>This is h3 $$$$$$$$
+        $$$$-> iplist</h3>
     <table id="ip_iplist">
-        <tr>
+        <th>
             <th>IP地址</th>
             <th>端口</th>
             <th>类型</th>
             <th>数度</th>
             <th>连接时间</th>
-        </tr>
+        </th>
         {% for ip in iplist %}
             {{ modules.IpList(ip) }}
         {% end %}
+        <tr>
+            <td>
+                {% for item in range(1, all_page+1) %}
+                    {%if item == page_info %}
+                    <a>{{item}}</a>&nbsp;|&nbsp;
+                    {%else%}
+                    <a href="/?page={{item}}&page_count={{page_count}}">{{item}}</a>&nbsp;|&nbsp;
+                    {%end%}
+                {% end %}
+            </td>
+            <td>共{{all_page}}页</td>
+        </tr>
 <!--
         <tr class="odd">
             <td>{{ ip["ip"] }}</td>

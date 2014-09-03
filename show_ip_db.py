@@ -16,7 +16,9 @@ define("port", default=8022, help="run in showdb.", type=int)
 class Application(tornado.web.Application):
     def __init__(self):
         print "i am application"
-        handlers = [(r"/", ShowHandler)]
+        handlers = [
+            (r"/", ShowHandler),
+        ]
         settings = dict(
             templates_path=os.path.join(os.path.dirname(__file__), "templates"),
             static_path=os.path.join(os.path.dirname(__file__), "static"),
@@ -31,15 +33,17 @@ class Application(tornado.web.Application):
 class ShowHandler(tornado.web.RequestHandler):
     """"""   
     def get(self):
-        self.write("i am showhandler")
-        print "i am showhandler222"
         coll = self.application.db.iplist
-        iplist = coll.find().limit(10)        
-        self.write("hello sb")
+        page = int(self.get_argument('page', 1))
+        page_count = int(self.get_argument('page_count', 10))
+        all_page = coll.find().count()/page_count
+        iplist = coll.find().skip((page-1)*page_count).limit(page_count)
         self.render(
             "templates/ip_list.html",
-            page_number="11111",
-            iplist=iplist
+            iplist=iplist,
+            page_info=page,
+            page_count=page_count,
+            all_page=all_page
         )
 
 
@@ -48,7 +52,7 @@ class IpListModule(tornado.web.UIModule):
         print "i am IpListModule"
         return self.render_string(
             "templates/modules/single_ip.html",
-            ip=ip,
+            ip=ip
         )
 
 if __name__ == "__main__":
