@@ -16,15 +16,11 @@
         {% for ip in iplist %}
             {{ modules.IpList(ip) }}
         {% end %}
-<!--
-        <tr class="odd">
-            <td>{{ ip["ip"] }}</td>
-            <td>{{ ip["port"] }}</td>
-            <td>{{ ip["http_type"] }}</td>
-            <td>{{ ip["link_speed"] }}</td>
-            <td>{{ ip["link_time"] }}</td>
-        </tr>
--->
     </table>
+</div>
+{% end %}
+{% block page %}
+<div class="page_content">
+    {{ modules.PagePart(page_num, current_page, total_num, page_items_num) }}
 </div>
 {% end %}
