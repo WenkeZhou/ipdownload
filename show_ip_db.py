@@ -9,7 +9,6 @@ import tornado.ioloop
 
 import math
 import pymongo
-import paginator
 
 from tornado.options import define, options
 define("port", default=8022, help="run in showdb.", type=int)
@@ -91,16 +90,7 @@ class PagePartModule(tornado.web.UIModule):
                 _htmls.append('<a>...</a>')
                 for i in range(page_num-2, page_num+1):
                     _htmls.append('<a href="?current_page=%d&page_items_num=%d">%d</a>' % (i, page_items_num, i))
-            elif (current_page >= page_num - 7) & (current_page < page_num):
-                for i in range(1, 4):
-                    _htmls.append('<a href="?current_page=%d&page_items_num=%d">%d</a>' % (i, page_items_num, i))
-                _htmls.append('<a>...</a>')
-                for i in range(page_num-7, page_num+1):
-                    if i == current_page:
-                        _htmls.append('<a class="current_page_status">%d</a>' % i)
-                    else:
-                        _htmls.append('<a href="?current_page=%d&page_items_num=%d">' % (i, page_items_num))
-            else:
+            elif (current_page >= 9) & (current_page < page_num - 7):
                 for i in range(1, 4):
                     _htmls.append('<a href="?current_page=%d&page_items_num=%d">%d</a>' % (i, page_items_num, i))
                 _htmls.append('<a>...</a>')
@@ -112,6 +102,15 @@ class PagePartModule(tornado.web.UIModule):
                 _htmls.append('<a>...</a>')
                 for i in range(page_num-2, page_num+1):
                     _htmls.append('<a href="?current_page=%d&page_items_num=%d">%d</a>' % (i, page_items_num, i))
+            elif (current_page >= page_num -7) & (current_page <= page_num):
+                for i in range(1, 4):
+                    _htmls.append('<a href="?current_page=%d&page_items_num=%d">%d</a>' % (i, page_items_num, i))
+                _htmls.append('<a>...</a>')
+                for i in range(page_num - 7, page_num + 1):
+                    if i == current_page:
+                        _htmls.append('<a class="current_page_status">%d</a>' % current_page)
+                    else:
+                        _htmls.append('<a href="?current_page=%d&page_items_num=%d">%d</a>' % (i, page_items_num, i))
 
         if current_page == page_num:
             _htmls.append('<a class="disable">末页</a>')
