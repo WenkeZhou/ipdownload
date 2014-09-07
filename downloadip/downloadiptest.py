@@ -14,7 +14,6 @@ COUNT = 0
 
 
 def connect_to_db():
-    dbh = 0
     try:
         conn = MongoClient(host="localhost", port=27017)
     except ConnectionFailure, e:
@@ -25,8 +24,17 @@ def connect_to_db():
 
 
 def download_item():
-    my_dbh = connect_to_db()
+    """ """
     global COUNT
+    my_dbh = connect_to_db()
+    print "11111111111111111111111"
+    # print my_dbh.acceptive.find_one({"_id": "status"})["accpeted_status"]
+    my_dbh.acceptive.update({"_id": "status"}, {"$set": {"accpeted_status": 0}}, safe=True)
+    # print my_dbh.acceptive.find_one({"_id": "status"})["accpeted_status"]
+    print "222222222222222222222"
+    print conn.iplist.count()
+    conn.iplist.remove()
+    print conn.iplist.count()
 
     if my_dbh != 0:
         print "Return is corret!"
@@ -63,29 +71,27 @@ def download_item():
                 "created_count": COUNT
             }, safe=True)
         print "There are %d items now!" % (my_dbh.iplist.count())
-        print "Finish getting the %d page" % i
+        print "----------Finish getting the %d page--------------" % i
+        print "the db status:"
+        print my_dbh.acceptive.find_one({"_id": "status"})["accpeted_status"]
+    print "3333333333333333333333333"
+    print my_dbh.acceptive.find_one({"_id": "status"})["accpeted_status"]
+    my_dbh.acceptive.update({"_id": "status"}, {"$set": {"accpeted_status": 1}}, safe=True)
+    print my_dbh.acceptive.find_one({"_id": "status"})["accpeted_status"]
+    print "444444444444444444"
 
 
 if __name__ == "__main__":
-    download_item()
     try:
         conn = connect_to_db()
+        print conn.iplist.count()
     except ConnectionFailure, e:
         sys.stderr.write("Could not connect to MongoDB: %s" % e)
         sys.exit(1)
-    result = conn
-    cursor = result.iplist.find()
-    cursor.count()
-    for item in cursor:
-        print item
-    # while cursor.hasNext():
-    #     obj = cursor
-    #     print "http_type:%s, ip:%s,  port:%s, current_count:%d" % (obj["http_type"], obj["ip"], obj["port"],
-    #                                                                obj["current_count"])
-    #     obj = cursor.next()
-    # scheduler = BlockingScheduler()
-    # scheduler.add_job(download_item, "interval", seconds=20)
-    # try:
-    #     scheduler.start()
-    # except (KeyboardInterrupt, SystemExit):
-    #     pass
+
+    scheduler = BlockingScheduler()
+    scheduler.add_job(download_item, "cron", second=1)
+    try:
+        scheduler.start()
+    except (KeyboardInterrupt, SystemExit):
+        pass

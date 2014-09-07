@@ -13,6 +13,9 @@ import pymongo
 from tornado.options import define, options
 define("port", default=8022, help="run in showdb.", type=int)
 
+url = "http://www.xici.net.co/nn"
+COUNT = 0
+
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -32,23 +35,33 @@ class Application(tornado.web.Application):
 class ShowHandler(tornado.web.RequestHandler):
     """"""   
     def get(self):
-        coll = self.application.db.iplist
-        total_num = coll.find().count()
-        current_page = int(self.get_argument("current_page", 1))
-        page_items_num = int(self.get_argument("page_item_num", 10))
-        page_num = int(math.ceil(total_num/page_items_num)) if total_num > 0 else 0
-        print "i am showhandler222"
-        iplist = coll.find().skip((current_page-1)*page_items_num).limit(10)
-        self.write("hello sb")
-        self.render(
-            "templates/ip_list.html",
-            page_number="11111",
-            iplist=iplist,
-            page_num=page_num,
-            current_page=current_page,
-            total_num=total_num,
-            page_items_num=page_items_num,
-        )
+        flag = self.application.db.acceptive.find_one({"_id": "status"})["accpeted_status"]
+        # self.application.db.acceptive.update({"_id": "status"}, {"$set": {"accpeted_status": 0}}, safe=True)
+        if flag == 1:
+            coll = self.application.db.iplist
+            total_num = coll.find().count()
+            current_page = int(self.get_argument("current_page", 1))
+            page_items_num = int(self.get_argument("page_item_num", 10))
+            page_num = int(math.ceil(total_num/page_items_num)) if total_num > 0 else 0
+            print "i am showhandler222"
+            iplist = coll.find().skip((current_page-1)*page_items_num).limit(10)
+            self.write("hello sb")
+            self.render(
+                "templates/ip_list.html",
+                page_number="11111",
+                iplist=iplist,
+                page_num=page_num,
+                current_page=current_page,
+                total_num=total_num,
+                page_items_num=page_items_num,
+            )
+        elif flag ==0:
+            self.render(
+                "templates/db_unaccetped.html",
+                DBACCEPTABLE=flag,
+            )
+        else:
+            print "Error in ShowHandler because of flag."
 
 
 class IpListModule(tornado.web.UIModule):
@@ -122,7 +135,6 @@ class PagePartModule(tornado.web.UIModule):
         return '\r\n'.join(_htmls)
 
 if __name__ == "__main__":
-    print "I'am first."
     tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
