@@ -13,6 +13,18 @@ url = "http://www.xici.net.co/nn"
 COUNT = 0
 
 
+def deco(func):
+    def _deco(*args, **kwargs):
+        start_time = time.time()
+        ret = func(*args, **kwargs)
+        end_time = time.time()
+        process_time = end_time - start_time
+        print '%s\t: %.3f ' % (func.func_name, process_time)
+        return ret
+    return _deco
+
+
+@deco
 def connect_to_db():
     try:
         conn = MongoClient(host="localhost", port=27017)
@@ -23,28 +35,26 @@ def connect_to_db():
     return dbh
 
 
+import time
+
+
+@deco
+def my_urlopen(url_item):
+    return urllib2.urlopen(url_item)
+
+@deco
 def download_item():
     """ """
     global COUNT
     my_dbh = connect_to_db()
-    print "11111111111111111111111"
-    # print my_dbh.acceptive.find_one({"_id": "status"})["accpeted_status"]
     my_dbh.acceptive.update({"_id": "status"}, {"$set": {"accpeted_status": 0}}, safe=True)
-    # print my_dbh.acceptive.find_one({"_id": "status"})["accpeted_status"]
-    print "222222222222222222222"
     print conn.iplist.count()
     conn.iplist.remove()
-    print conn.iplist.count()
-
-    if my_dbh != 0:
-        print "Return is corret!"
-    else:
-        print "There is something wrong with dbh!!"
 
     for i in range(1, 11):
         url_item = url + "/%d" % i
         print "get the %d page" % i
-        content = urllib2.urlopen(url_item)
+        content = my_urlopen(url_item)
         html = content.read()
         soup = BeautifulSoup(html)
 
