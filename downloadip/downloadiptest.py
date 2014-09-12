@@ -1,13 +1,14 @@
 #!/usr/bin/evn python
 #-*- coding: utf-8 -*-
 
-import time
+import Queue
 from apscheduler.schedulers.blocking import BlockingScheduler
 import urllib2
 import sys
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
+import time
 
 url = "http://www.xici.net.co/nn"
 COUNT = 0
@@ -35,9 +36,6 @@ def connect_to_db():
     return dbh
 
 
-import time
-
-
 @deco
 def my_urlopen(url_item):
     return urllib2.urlopen(url_item)
@@ -48,8 +46,8 @@ def download_item():
     global COUNT
     my_dbh = connect_to_db()
     my_dbh.acceptive.update({"_id": "status"}, {"$set": {"accpeted_status": 0}}, safe=True)
-    print conn.iplist.count()
-    conn.iplist.remove()
+    print my_dbh.iplist.count()
+    my_dbh.iplist.remove()
 
     for i in range(1, 11):
         url_item = url + "/%d" % i
@@ -84,20 +82,16 @@ def download_item():
         print "----------Finish getting the %d page--------------" % i
         print "the db status:"
         print my_dbh.acceptive.find_one({"_id": "status"})["accpeted_status"]
-    print "3333333333333333333333333"
-    print my_dbh.acceptive.find_one({"_id": "status"})["accpeted_status"]
     my_dbh.acceptive.update({"_id": "status"}, {"$set": {"accpeted_status": 1}}, safe=True)
-    print my_dbh.acceptive.find_one({"_id": "status"})["accpeted_status"]
-    print "444444444444444444"
-
+    # print my_dbh.acceptive.find_one({"_id": "status"})["accpeted_status"]
 
 if __name__ == "__main__":
-    try:
-        conn = connect_to_db()
-        print conn.iplist.count()
-    except ConnectionFailure, e:
-        sys.stderr.write("Could not connect to MongoDB: %s" % e)
-        sys.exit(1)
+    # try:
+    #     conn = connect_to_db()
+    #     print conn.iplist.count()
+    # except ConnectionFailure, e:
+    #     sys.stderr.write("Could not connect to MongoDB: %s" % e)
+    #     sys.exit(1)
 
     scheduler = BlockingScheduler()
     scheduler.add_job(download_item, "cron", second=1)
