@@ -39,12 +39,15 @@ class ShowHandler(tornado.web.RequestHandler):
         # self.application.db.acceptive.update({"_id": "status"}, {"$set": {"accpeted_status": 0}}, safe=True)
         if flag == 1:
             coll = self.application.db.iplist
-            total_num = coll.find().count()
+            total_num = coll.find({"connect_time": {"$gte": 0}}).count()
+            # total_num = coll.find().count()
             current_page = int(self.get_argument("current_page", 1))
             page_items_num = int(self.get_argument("page_item_num", 10))
             page_num = int(math.ceil(total_num/page_items_num)) if total_num > 0 else 0
             print "i am showhandler222"
-            iplist = coll.find().skip((current_page-1)*page_items_num).limit(10)
+            # iplist = coll.find().skip((current_page-1)*page_items_num).limit(10)
+            iplist = coll.find({"connect_time": {"$gte": 0}}).sort("connect_time", pymongo.ASCENDING).skip(
+                (current_page-1)*page_items_num).limit(10)
             self.write("hello sb")
             self.render(
                 "templates/ip_list.html",
